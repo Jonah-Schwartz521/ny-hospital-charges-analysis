@@ -1,4 +1,4 @@
-
+CREATE TABLE feature_dataset AS
 WITH modeling_cte AS (
     SELECT
         gender,
@@ -18,8 +18,11 @@ WITH modeling_cte AS (
         AND length_of_stay ~ '^\d+$'
         AND gender IN ('M', 'F')
 )
-SELECT * 
-FROM modeling_cte
-LIMIT 100000 OFFSET 300000;
+SELECT * FROM modeling_cte;
 
 
+-- Verify table was created properly 
+SELECT COUNT(*) FROM feature_dataset;
+
+-- Preview table 
+SELECT * FROM feature_dataset LIMIT 100;
