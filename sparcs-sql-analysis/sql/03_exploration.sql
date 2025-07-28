@@ -11,6 +11,7 @@ LIMIT 5;
 SELECT COUNT(*) FROM modeling_table;
 
 
+
 -- Make sure there isn't any missing data 
 SELECT 
     COUNT(*) FILTER (WHERE total_charges IS NULL) AS null_charges,
@@ -19,6 +20,7 @@ SELECT
     COUNT(*) FILTER (WHERE ccs_diagnosis_description IS NULL) AS null_dx
 FROM 
     modeling_table;
+
 
 
 -- Distribution of charges 
@@ -31,6 +33,7 @@ FROM
     modeling_table;
 
 
+
 -- Charges by age group 
 SELECT
     age_group,
@@ -40,7 +43,8 @@ FROM
 GROUP BY
     age_group
 ORDER BY
-    avg_charge
+    avg_charge;
+
 
 
 -- Charges by gender 
@@ -54,6 +58,7 @@ GROUP BY
     gender;
 
 
+
 -- Top diagnoses by frequency 
 SELECT
     ccs_diagnosis_description,
@@ -65,6 +70,7 @@ GROUP BY
 ORDER BY
     frequency DESC
 LIMIT 10;
+
 
 
 -- Charges by diagnosis
@@ -95,3 +101,76 @@ GROUP BY
 ORDER BY
     avg_charge DESC;
 
+
+
+-- Charges by procedure 
+SELECT 
+    ccs_procedure_description,
+    ROUND(AVG(total_charges)) AS avg_charge,
+    COUNT(*) AS procedures
+FROM
+    modeling_table
+GROUP BY 
+    ccs_procedure_description
+HAVING
+    COUNT(*) > 500
+ORDER BY 
+    avg_charge DESC
+LIMIT 20;
+
+
+-- Charges by admission type 
+SELECT 
+    type_of_admission,
+    ROUND(AVG(total_charges)) AS avg_charge
+FROM
+    modeling_table
+GROUP BY 
+    type_of_admission
+ORDER BY 
+    avg_charge DESC;
+
+
+-- Charges by country or region 
+SELECT
+    hospital_county,
+    ROUND(AVG(total_charges)) AS avg_charge,
+    COUNT(*) AS patients
+FROM
+    modeling_table
+GROUP BY
+    hospital_county
+ORDER BY avg_charge DESC;
+
+
+-- Charges by payment type
+SELECT
+    payment_typology_1,
+    ROUND(AVG(total_charges)) AS avg_charge,
+    COUNT(*) AS patients
+FROM
+    modeling_table
+GROUP BY
+    payment_typology_1
+ORDER BY 
+    avg_charge DESC;
+
+
+-- Length of stay vs charges
+SELECT
+    CASE
+        WHEN length_of_stay::int <= 1 THEN '0-1 days'
+        WHEN length_of_stay::int <= 3 THEN '2–3 days'
+        WHEN length_of_stay::int <= 7 THEN '4–7 days'
+        ELSE '8+ days'
+    END AS stay_range,
+    ROUND(AVG(total_charges)) AS avg_charge,
+    COUNT(*) AS patients
+FROM 
+    modeling_table
+WHERE 
+    length_of_stay ~ '^\d+$'   -- only keep numeric values
+GROUP BY 
+    stay_range
+ORDER BY 
+    avg_charge DESC;
