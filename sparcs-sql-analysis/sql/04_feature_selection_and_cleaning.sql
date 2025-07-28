@@ -20,4 +20,6 @@ WITH modeling_cte AS (
 )
 SELECT * 
 FROM modeling_cte
-LIMIT 50;
+LIMIT 100000 OFFSET 300000;
+
+
