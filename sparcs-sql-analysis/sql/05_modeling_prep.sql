@@ -1,5 +1,7 @@
+-- Drop existing table if it exists
 DROP TABLE IF EXISTS model_input;
 
+-- Create model_input table with encoded features + numeric los
 CREATE TABLE model_input AS
 SELECT
   -- Encode gender
@@ -39,6 +41,18 @@ SELECT
     WHEN payment_type = 'Medicaid' THEN 1
     ELSE 0
   END AS payment_type_encoded,
+
+  -- Encode the diagnosis description
+  DENSE_RANK() OVER (ORDER BY ccs_diagnosis_description) AS diagnosis_encoded,
+
+  -- Encode the procedure description
+  DENSE_RANK() OVER (ORDER BY ccs_procedure_description) AS procedure_encoded,
+
+  -- Encode hospital county (label encoding)
+  DENSE_RANK() OVER (ORDER BY hospital_county) AS county_encoded,
+  
+  -- Numeric feature
+  los,
 
   -- Target
   total_charges
