@@ -1,33 +1,47 @@
-SELECT * 
-FROM feature_dataset
-LIMIT 100;
+DROP TABLE IF EXISTS model_input;
 
-
-SELECT 
-  -- Encode gender: 0 for Female, 1 for Male
+CREATE TABLE model_input AS
+SELECT
+  -- Encode gender
   CASE WHEN gender = 'F' THEN 0 ELSE 1 END AS gender_encoded,
 
-  -- Encode age groups into ordinal values (younger to older)
+  -- Encode age group
   CASE 
     WHEN age_group = '0 to 17' THEN 0
     WHEN age_group = '18 to 29' THEN 1
     WHEN age_group = '30 to 49' THEN 2
     WHEN age_group = '50 to 69' THEN 3
     WHEN age_group = '70 or Older' THEN 4
-    ELSE NULL  -- Catch any unexpected age values
+    ELSE NULL
   END AS age_group_encoded,
 
-  -- Encode severity of illness: higher number = more severe
+  -- Encode severity
   CASE 
     WHEN severity = 'Minor' THEN 1
     WHEN severity = 'Moderate' THEN 2
     WHEN severity = 'Major' THEN 3
     WHEN severity = 'Extreme' THEN 4
-    ELSE NULL  -- Catch any unknown severity labels
+    ELSE NULL
   END AS severity_encoded,
 
-  -- Target variable for modeling
-  total_charges
-FROM feature_dataset
-LIMIT 100;
+  -- Encode admission type
+  CASE 
+    WHEN type_of_admission = 'Emergency' THEN 3
+    WHEN type_of_admission = 'Urgent' THEN 2
+    WHEN type_of_admission = 'Elective' THEN 1
+    ELSE 0
+  END AS admission_encoded,
 
+  -- Encode payment type
+  CASE 
+    WHEN payment_type = 'Private Health Insurance' THEN 3
+    WHEN payment_type = 'Medicare' THEN 2
+    WHEN payment_type = 'Medicaid' THEN 1
+    ELSE 0
+  END AS payment_type_encoded,
+
+  -- Target
+  total_charges
+
+FROM feature_dataset
+WHERE age_group IS NOT NULL AND severity IS NOT NULL;
