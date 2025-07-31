@@ -68,3 +68,14 @@ Longer stays significantly drive up costs.
 - Most common: *Medicare*, *Medicaid*, *Private Insurance*
 
 ---
+
+## Model Files
+
+Trained models (e.g., `.pkl` files) are saved in the `models/` folder.  
+These files are excluded from Git tracking via `.gitignore`.
+
+To reproduce or use the model:
+
+```python
+import joblib
+model = joblib.load("models/my_model.pkl")
