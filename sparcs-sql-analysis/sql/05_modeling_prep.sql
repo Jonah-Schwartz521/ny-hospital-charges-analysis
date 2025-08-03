@@ -59,3 +59,18 @@ SELECT
 
 FROM feature_dataset
 WHERE age_group IS NOT NULL AND severity IS NOT NULL;
+
+
+
+SELECT DISTINCT 
+  ccs_diagnosis_description,
+  DENSE_RANK() OVER (ORDER BY ccs_diagnosis_description) AS diagnosis_encoded
+FROM feature_dataset
+ORDER BY diagnosis_encoded
+
+
+SELECT DISTINCT 
+  ccs_diagnosis_description,
+  DENSE_RANK() OVER (ORDER BY ccs_diagnosis_description) AS diagnosis_encoded
+FROM feature_dataset
+WHERE ccs_diagnosis_description = 'Liveborn';
