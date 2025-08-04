@@ -62,6 +62,7 @@ WHERE age_group IS NOT NULL AND severity IS NOT NULL;
 
 
 
+-- Diagnosis Mapping
 SELECT DISTINCT 
   ccs_diagnosis_description,
   DENSE_RANK() OVER (ORDER BY ccs_diagnosis_description) AS diagnosis_encoded
@@ -69,8 +70,63 @@ FROM feature_dataset
 ORDER BY diagnosis_encoded
 
 
-SELECT DISTINCT 
-  ccs_diagnosis_description,
-  DENSE_RANK() OVER (ORDER BY ccs_diagnosis_description) AS diagnosis_encoded
-FROM feature_dataset
-WHERE ccs_diagnosis_description = 'Liveborn';
+-- Procedure Mapping
+SELECT 
+  DENSE_RANK() OVER (ORDER BY ccs_procedure_description) AS procedure_encoded,
+  ccs_procedure_description
+FROM (
+  SELECT DISTINCT ccs_procedure_description
+  FROM feature_dataset
+  WHERE ccs_procedure_description IS NOT NULL
+) AS procedure_map;
+
+-- County Mapping
+SELECT 
+  DENSE_RANK() OVER (ORDER BY hospital_county) AS county_encoded,
+  hospital_county
+FROM (
+  SELECT DISTINCT hospital_county
+  FROM feature_dataset
+  WHERE hospital_county IS NOT NULL
+) AS county_map;
+
+-- Severity Mapping (Hardcoded)
+SELECT * FROM (VALUES
+  (1, 'Minor'),
+  (2, 'Moderate'),
+  (3, 'Major'),
+  (4, 'Extreme')
+) AS severity_map(severity_encoded, severity);
+
+-- Gender Mapping (Hardcoded)
+SELECT * FROM (VALUES
+  (0, 'F'),
+  (1, 'M')
+) AS gender_map(gender_encoded, gender);
+
+-- Age Group Mapping
+SELECT * FROM (VALUES
+  (0, '0 to 17'),
+  (1, '18 to 29'),
+  (2, '30 to 49'),
+  (3, '50 to 69'),
+  (4, '70 or Older')
+) AS age_group_map(age_group_encoded, age_group);
+
+-- Admission Type Mapping
+SELECT * FROM (VALUES
+  (3, 'Emergency'),
+  (2, 'Urgent'),
+  (1, 'Elective'),
+  (0, 'Other')
+) AS admission_map(admission_encoded, admission_type);
+
+-- Payment Type Mapping
+SELECT * FROM (VALUES
+  (3, 'Private Health Insurance'),
+  (2, 'Medicare'),
+  (1, 'Medicaid'),
+  (0, 'Other')
+) AS payment_type_map(payment_type_encoded, payment_type);
+
+
