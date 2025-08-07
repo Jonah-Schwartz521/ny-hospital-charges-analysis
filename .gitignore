@@ -1,3 +1,18 @@
-data/*.csv
+# Ignore all CSVs in data except mappings
+data/raw/*.csv
+data/processed/*.csv
+data/predictions/*.csv
+data/residuals/*.csv
+
+# Keep mapping files under version control
+!data/mappings/*.csv
+
+# Ignore model binaries
 models/*.pkl
-sparcs-sql-analysis/data/*.csv
+
+# In case there are CSVs under the project path copy
+sparcs-sql-analysis/data/**/*.csv
+
+# OS & editor files
+.DS_Store
+.vscode/
