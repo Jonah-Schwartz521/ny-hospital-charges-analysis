@@ -1,81 +1,127 @@
-## Exploratory Data Analysis (EDA)
+# **New York Hospital Charges Prediction**
 
-I explored the `modeling_table` to understand what affects hospital charges in New York. Here’s what I found:
-
-### Charges Overview
-- **Average charge:** $46,000  
-- **Median charge:** $25,000  
-- **Max charge:** Over $10 million — likely extreme outliers
-
-### Charges by Age Group
-- **0–17:** ~$29,000  
-- **18–29:** ~$29,800  
-- **30–49:** ~$37,600  
-- **50–69:** ~$56,400  
-- **70+:** ~$56,600  
-
-Charges steadily increase with age.
-
-### Charges by Gender
-- **Male:** ~$50,800  
-- **Female:** ~$42,200  
-- **Unknown:** ~$32,000 (very few patients)
-
-Males had noticeably higher average charges.
-
-### Most Common Diagnoses
-Top 5 by frequency:
-1. Liveborn
-2. Septicemia (except in labor)
-3. Osteoarthritis
-4. Mood disorders
-5. Alcohol-related disorders
-
-### Most Expensive Diagnoses (with 1,000+ cases)
-- **Leukemias:** ~$239,000  
-- **Heart valve disorders:** ~$178,000  
-- **Cancers and severe cardiovascular conditions** also had high average charges
-
-### Most Expensive Procedures (with 500+ cases)
-- **Organ Transplant:** ~$734,000  
-- **Tracheostomy:** ~$485,000  
-- **Bone Marrow Transplant:** ~$405,000  
-- Other expensive surgeries: heart, nerve, or vascular procedures
-
-### Length of Stay vs. Charges
-- **0–1 days:** ~$19,000  
-- **2–3 days:** ~$23,000  
-- **4–7 days:** ~$43,700  
-- **8+ days:** ~$121,000  
-
-Longer stays significantly drive up costs.
-
-### Charges by Admission Type
-- **Trauma:** ~$76,300  
-- **Elective:** ~$53,600  
-- **Emergency:** ~$46,700  
-- **Newborn:** ~$22,100 (lowest)
-
-### Charges by County
-- Highest: **Manhattan ($68K)**, **Nassau ($66K)**, **Westchester ($57K)**  
-- Rural counties averaged as low as $10K–$20K
-
-### Charges by Payment Type
-- Highest averages:  
-  - *Miscellaneous/Other:* ~$62,800  
-  - *Medicare:* ~$56,500  
-  - *Department of Corrections:* ~$48,400  
-- Most common: *Medicare*, *Medicaid*, *Private Insurance*
+## Overview  
+This project predicts **total hospital charges** for inpatient discharges in New York using the **SPARCS (Statewide Planning and Research Cooperative System)** dataset.  
+The workflow includes **SQL-based data preparation**, **exploratory data analysis**, **feature engineering**, and **LightGBM modeling** — with segmentation, quantile regression, and hybrid blending to minimize prediction error.  
 
 ---
 
-## Model Files
+## Project Structure  
 
-Trained models (e.g., `.pkl` files) are saved in the `models/` folder.  
-These files are excluded from Git tracking via `.gitignore`.
+ny-hospital-charges-analysis/
+│
+├── data/
+│   ├── raw/           # Original datasets (ignored in Git)
+│   ├── processed/     # Cleaned & feature-engineered datasets
+│   ├── predictions/   # Model outputs
+│   ├── residuals/     # Residual/error analysis files
+│   └── mappings/      # Encoding lookup tables (kept in Git)
+│
+├── models/
+│   ├── baseline/      # Untuned reference models
+│   ├── tuned/         # Tuned LOS group models
+│   ├── experiments/   # Experimental runs
+│   └── final/         # Best-performing models kept in Git
+│
+├── notebooks/         # Jupyter notebooks for EDA, modeling, explainability
+├── sql/               # SQL scripts for data prep & feature engineering
+└── README.md
 
-To reproduce or use the model:
 
-```python
+---
+
+## Workflow  
+
+### **1️⃣ Data Preparation (SQL)**  
+- **01_create_sparcs_discharges.sql** → Creates raw table from SPARCS CSV.  
+- **02_create_modeling_table.sql** → Selects relevant columns for modeling.  
+- **03_exploration.sql** → SQL-based exploratory data analysis.  
+- **04_feature_selection.sql** → Filters & cleans modeling-ready dataset.  
+- **05_encode_features.sql** → Encodes categorical variables & exports mapping tables.  
+
+### **2️⃣ Exploratory Data Analysis (Key Findings)**  
+- **Average total charges**: ~$46,000.  
+- Charges increase with **length of stay** and **severity**.  
+- Highest-cost procedures: organ transplants, tracheostomies, bone marrow transplants.  
+- Counties with highest charges: Manhattan, Nassau, Westchester.  
+
+### **3️⃣ Modeling (Python + LightGBM)**  
+- **Base Model**: Global LightGBM on encoded features.  
+- **Segmentation**:  
+  - By **Length of Stay (LOS)** → short, moderate, long, extended.  
+  - Quantile regression for long & extended LOS groups.  
+- **Hybrid Model**: Blends LOS-specific predictions with global predictions for best MAE.  
+
+---
+
+## Final Results  
+
+| Model Variant            | MAE ($)    |
+|--------------------------|------------|
+| Baseline Global LightGBM | ~11,137.83 |
+| LOS Hybrid Quantile      | **~10,486.20** |
+
+The **Quantile Long + Extended LOS Hybrid** model is the **final deliverable**.
+---
+
+##  Explainability (SHAP Insights)  
+- **Length of stay** and **severity of illness** are the dominant drivers of cost.  
+- Certain **diagnosis–procedure combinations** produce large cost spikes (especially for outliers).  
+- Segmentation improves prediction accuracy for long and extended LOS cases.  
+
+## Dataset  
+
+The dataset is provided by the **New York State Department of Health** via the [SPARCS](https://www.health.ny.gov/statistics/sparcs/) program.
+
+- **Rows:** ~2 million inpatient discharge records  
+- **Columns:** Patient demographics, diagnoses, procedures, length of stay, severity, hospital info, total charges  
+- Due to size, the raw CSV is not stored in GitHub. Download it from the official site and place it in:  
+
+
+
+---
+
+## How to Reproduce
+
+### 1️⃣ Create Database & Load Data
+Run the table creation script:
+```bash
+psql -U postgres -f sql/01_create_sparcs_discharges.sql
+
+
+Step 2: Load the raw SPARCS CSV into PostgreSQL
+Run this inside the psql shell (adjust the path to match your file location): \COPY sparcs_discharges FROM 'data/raw/sparcs_inpatient.csv' CSV HEADER
+
+2️⃣ Prepare Modeling Dataset
+
+Run the SQL scripts in order:
+
+psql -U postgres -f sql/02_modeling_table.sql
+psql -U postgres -f sql/04_feature_selection_and_cleaning.sql
+psql -U postgres -f sql/05_modeling_prep.sql
+
+3️⃣ Train or Load Models
+
 import joblib
-model = joblib.load("models/my_model.pkl")
+
+# Example: Load tuned long LOS quantile model
+long_quantile = joblib.load("models/final/model_los_long_quantile.pkl")
+
+# Example: Load tuned extended LOS quantile model
+extended_quantile = joblib.load("models/final/model_los_extended_quantile.pkl")
+
+# Example: Load global tuned model
+global_model = joblib.load("models/final/final_tuned_lgbm.joblib")
+
+4️⃣ Generate Predictions
+# Predict using the hybrid approach
+# (use quantile models for Long/Extended LOS, global for others)
+preds = hybrid_predict(global_model, long_quantile, extended_quantile, X_test)
+
+5️⃣ Evaluate Performance
+
+| Model Variant                          | MAE ($)    |
+|----------------------------------------|------------|
+| Baseline Global LightGBM               | ~11,137.83 |
+| Quantile Long + Extended LOS Hybrid    | **~10,486.20** |
+
