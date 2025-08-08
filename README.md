@@ -113,21 +113,30 @@ The dataset is provided by the **New York State Department of Health** via the [
 Run the table creation script:
 ```bash
 psql -U postgres -f sql/01_create_sparcs_discharges.sql
-
+```
 
 Step 2: Load the raw SPARCS CSV into PostgreSQL
-Run this inside the psql shell (adjust the path to match your file location): \COPY sparcs_discharges FROM 'data/raw/sparcs_inpatient.csv' CSV HEADER
+Run this inside the psql shell (adjust the path to match your file location):
+```sql
+\COPY sparcs_discharges FROM 'data/raw/sparcs_inpatient.csv' CSV HEADER
+```
+
+---
 
 2️⃣ Prepare Modeling Dataset
 
 Run the SQL scripts in order:
-
+```bash
 psql -U postgres -f sql/02_modeling_table.sql
 psql -U postgres -f sql/04_feature_selection_and_cleaning.sql
 psql -U postgres -f sql/05_modeling_prep.sql
+```
+
+---
 
 3️⃣ Train or Load Models
 
+```python
 import joblib
 
 # Example: Load tuned long LOS quantile model
@@ -138,11 +147,18 @@ extended_quantile = joblib.load("models/final/model_los_extended_quantile.pkl")
 
 # Example: Load global tuned model
 global_model = joblib.load("models/final/final_tuned_lgbm.joblib")
+```
+
+---
 
 4️⃣ Generate Predictions
+```python
 # Predict using the hybrid approach
 # (use quantile models for Long/Extended LOS, global for others)
 preds = hybrid_predict(global_model, long_quantile, extended_quantile, X_test)
+```
+
+---
 
 5️⃣ Evaluate Performance
 
