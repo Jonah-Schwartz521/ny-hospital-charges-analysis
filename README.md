@@ -10,47 +10,48 @@ Predicting hospital charges accurately is crucial for healthcare cost management
 
 ---
 
-## Project Structure  
+## Project Structure
 
 ```text
 ny-hospital-charges-analysis/
 │
 ├── data/
 │   ├── raw/           # Original datasets (ignored in Git)
-│   ├── processed/     # Cleaned & feature-engineered datasets
+│   ├── processed/     # Cleaned and feature-engineered datasets
 │   ├── predictions/   # Model outputs
-│   ├── residuals/     # Residual/error analysis files
+│   ├── residuals/     # Residual and error analysis files
 │   └── mappings/      # Encoding lookup tables (kept in Git)
 │
 ├── models/
 │   ├── baseline/      # Untuned reference models
 │   ├── tuned/         # Tuned LOS group models
 │   ├── experiments/   # Experimental runs
-│   └── final/         # Best-performing models kept in Git
+│   └── final/         # Best-performing models (kept in Git)
 │
 ├── notebooks/         # Jupyter notebooks for EDA, modeling, explainability
-├── sql/               # SQL scripts for data prep & feature engineering
+├── sql/               # SQL scripts for data preparation and feature engineering
+├── images/            # Plots and visual assets
 └── README.md
-
+```
 
 ---
 
 ## Workflow  
 
-### **1️⃣ Data Preparation (SQL)**  
+### **Data Preparation (SQL)**  
 - **01_create_sparcs_discharges.sql** → Creates raw table from SPARCS CSV.  
 - **02_create_modeling_table.sql** → Selects relevant columns for modeling.  
 - **03_exploration.sql** → SQL-based exploratory data analysis.  
 - **04_feature_selection.sql** → Filters & cleans modeling-ready dataset.  
 - **05_encode_features.sql** → Encodes categorical variables & exports mapping tables.  
 
-### **2️⃣ Exploratory Data Analysis (Key Findings)**  
+### **Exploratory Data Analysis (Key Findings)**  
 - **Average total charges**: ~$46,000.  
 - Charges increase with **length of stay** and **severity**.  
 - Highest-cost procedures: organ transplants, tracheostomies, bone marrow transplants.  
 - Counties with highest charges: Manhattan, Nassau, Westchester.  
 
-### **3️⃣ Modeling (Python + LightGBM)**  
+### **Modeling (Python + LightGBM)**  
 - **Base Model**: Global LightGBM on encoded features.  
 - **Segmentation**:  
   - By **Length of Stay (LOS)** → short, moderate, long, extended.  
@@ -101,15 +102,16 @@ The dataset is provided by the **New York State Department of Health** via the [
 
 ## Notebooks
 
-- `notebooks/eda.ipynb` — Exploratory Data Analysis  
-- `notebooks/modeling.ipynb` — Model training and evaluation  
-- `notebooks/shap_analysis.ipynb` — SHAP explainability analysis  
+- `notebooks/04_los_segmented_modeling.ipynb` — LOS-based segmented modeling  
+- `notebooks/05_los_ensemble_prediction.ipynb` — Ensemble prediction for LOS groups  
+- `notebooks/06_feature_engineering.ipynb` — Feature engineering  
+- `notebooks/07_final_model_lightgbm.ipynb` — Final tuned LightGBM model  
 
 ---
 
 ## How to Reproduce
 
-### 1️⃣ Create Database & Load Data
+### 1. Create Database & Load Data
 Run the table creation script:
 ```bash
 psql -U postgres -f sql/01_create_sparcs_discharges.sql
@@ -123,7 +125,7 @@ Run this inside the psql shell (adjust the path to match your file location):
 
 ---
 
-2️⃣ Prepare Modeling Dataset
+2. Prepare Modeling Dataset
 
 Run the SQL scripts in order:
 ```bash
@@ -134,7 +136,7 @@ psql -U postgres -f sql/05_modeling_prep.sql
 
 ---
 
-3️⃣ Train or Load Models
+3. Train or Load Models
 
 ```python
 import joblib
@@ -151,7 +153,7 @@ global_model = joblib.load("models/final/final_tuned_lgbm.joblib")
 
 ---
 
-4️⃣ Generate Predictions
+4. Generate Predictions
 ```python
 # Predict using the hybrid approach
 # (use quantile models for Long/Extended LOS, global for others)
@@ -160,7 +162,7 @@ preds = hybrid_predict(global_model, long_quantile, extended_quantile, X_test)
 
 ---
 
-5️⃣ Evaluate Performance
+5. Evaluate Performance
 
 | Model Variant                          | MAE ($)    |
 |----------------------------------------|------------|
