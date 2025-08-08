@@ -72,6 +72,17 @@ ny-hospital-charges-analysis/
 The achieved MAE values indicate that on average, the model's predictions deviate from the actual hospital charges by approximately $10,486. This level of accuracy is significant given the complexity and variability of inpatient costs, and it demonstrates the model's practical utility for forecasting and budgeting purposes.
 
 The **Quantile Long + Extended LOS Hybrid** model is the **final deliverable**.
+
+---
+
+## Key Findings
+
+1. Certain patient categories are much harder to predict — Extended LOS + Minor severity cases had unusually high residuals, suggesting unusual or rare cost drivers. Severe/extreme long-stay cases also showed high errors, likely due to complications or multiple procedures.
+
+2. Diagnosis groups drive large differences in accuracy — Oncology had the highest MAE (~$19.5K), followed by Orthopedic and Cardio-Metabolic cases. OB/GYN and Neonatal cases were among the most predictable, likely due to standardized care pathways.
+
+3. Hybrid segmentation improves accuracy, but there’s still room for improvement — The Quantile Long + Extended LOS Hybrid reduced MAE by ~6% over the baseline. Further gains may require richer features (e.g., insurance details, hospital policies) and advanced ensembling.
+
 ---
 
 ##  Explainability (SHAP Insights)  
