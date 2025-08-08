@@ -120,6 +120,20 @@ The dataset is provided by the **New York State Department of Health** via the [
 
 ## How to Reproduce
 
+### 0. Install Dependencies
+Make sure you have Python 3.12 (or compatible) installed.
+
+Create and activate a virtual environment:
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+Install the required packages:
+```bash
+pip install -r requirements.txt
+```
+
 ### 1. Create Database & Load Data
 Run the table creation script:
 ```bash
