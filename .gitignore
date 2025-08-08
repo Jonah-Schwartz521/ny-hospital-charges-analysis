@@ -1,3 +1,6 @@
+# DATA
+# ========================
+
 # Ignore all CSVs in data except mappings
 data/raw/*.csv
 data/processed/*.csv
@@ -7,12 +10,25 @@ data/residuals/*.csv
 # Keep mapping files under version control
 !data/mappings/*.csv
 
-# Ignore model binaries
-models/*.pkl
-
-# In case there are CSVs under the project path copy
+# In case there are CSVs under the old project path
 sparcs-sql-analysis/data/**/*.csv
 
-# OS & editor files
+
+# MODELS
+# ========================
+
+# Ignore all models by default
+models/*
+
+# Keep only final deliverables
+!models/final/*
+!models/final/**/*.pkl
+!models/final/**/*.joblib
+
+# SYSTEM / ENVIRONMENT
+# ========================
 .DS_Store
 .vscode/
+*.pyc
+__pycache__/
+.env
