@@ -120,6 +120,8 @@ The dataset is provided by the **New York State Department of Health** via the [
 
 ## How to Reproduce
 
+> **Note:** Skip custom PostgreSQL steps if using default port (5432) and matching OS/DB user.
+
 ### PostgreSQL Setup (Custom)
 
 If you use a non-default PostgreSQL setup (e.g., port 5433, custom user):
