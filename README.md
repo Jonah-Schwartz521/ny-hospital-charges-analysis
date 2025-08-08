@@ -8,6 +8,7 @@ The workflow includes **SQL-based data preparation**, **exploratory data analysi
 
 ## Project Structure  
 
+```text
 ny-hospital-charges-analysis/
 │
 ├── data/
