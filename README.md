@@ -4,6 +4,10 @@
 This project predicts **total hospital charges** for inpatient discharges in New York using the **SPARCS (Statewide Planning and Research Cooperative System)** dataset.  
 The workflow includes **SQL-based data preparation**, **exploratory data analysis**, **feature engineering**, and **LightGBM modeling** — with segmentation, quantile regression, and hybrid blending to minimize prediction error.  
 
+## Motivation
+
+Predicting hospital charges accurately is crucial for healthcare cost management and resource allocation. It enables hospitals and policymakers to anticipate expenses, improve budgeting, and identify cost drivers. This can lead to more efficient healthcare delivery, better patient outcomes, and reduced financial burden on both providers and patients.
+
 ---
 
 ## Project Structure  
@@ -62,6 +66,10 @@ ny-hospital-charges-analysis/
 | Baseline Global LightGBM | ~11,137.83 |
 | LOS Hybrid Quantile      | **~10,486.20** |
 
+### Results Interpretation
+
+The achieved MAE values indicate that on average, the model's predictions deviate from the actual hospital charges by approximately $10,486. This level of accuracy is significant given the complexity and variability of inpatient costs, and it demonstrates the model's practical utility for forecasting and budgeting purposes.
+
 The **Quantile Long + Extended LOS Hybrid** model is the **final deliverable**.
 ---
 
@@ -69,6 +77,15 @@ The **Quantile Long + Extended LOS Hybrid** model is the **final deliverable**.
 - **Length of stay** and **severity of illness** are the dominant drivers of cost.  
 - Certain **diagnosis–procedure combinations** produce large cost spikes (especially for outliers).  
 - Segmentation improves prediction accuracy for long and extended LOS cases.  
+
+![SHAP Summary Plot](images/shap_summary.png "SHAP Summary Plot showing feature importance and impact on model output")
+
+## Future Improvements
+
+- Explore advanced ensembling techniques to further reduce prediction error.  
+- Implement more granular segmentation strategies beyond LOS groups.  
+- Incorporate additional features such as insurance type, hospital specialization, and patient comorbidities.  
+- Experiment with other model architectures like neural networks or gradient boosting variants.
 
 ## Dataset  
 
@@ -79,6 +96,14 @@ The dataset is provided by the **New York State Department of Health** via the [
 - Due to size, the raw CSV is not stored in GitHub. Download it from the official site and place it in:  
 
 
+
+---
+
+## Notebooks
+
+- `notebooks/eda.ipynb` — Exploratory Data Analysis  
+- `notebooks/modeling.ipynb` — Model training and evaluation  
+- `notebooks/shap_analysis.ipynb` — SHAP explainability analysis  
 
 ---
 
