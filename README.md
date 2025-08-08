@@ -120,6 +120,48 @@ The dataset is provided by the **New York State Department of Health** via the [
 
 ## How to Reproduce
 
+### PostgreSQL Setup (Custom)
+
+If you use a non-default PostgreSQL setup (e.g., port 5433, custom user):
+
+1. Initialize a new data directory with a password prompt:
+
+```bash
+mkdir -p ~/pg/nyhc14
+/opt/homebrew/opt/postgresql@14/bin/initdb -D ~/pg/nyhc14 -U postgres -A scram-sha-256 -W
+```
+
+2. Start PostgreSQL on port 5433:
+
+```bash
+/opt/homebrew/opt/postgresql@14/bin/pg_ctl -D ~/pg/nyhc14 -o "-p 5433" -l ~/pg/nyhc14/logfile start
+```
+
+3. Create a role and database (connect as postgres superuser):
+
+```sql
+CREATE ROLE nyhc_user WITH LOGIN PASSWORD 'your_password';
+CREATE DATABASE nyhc OWNER nyhc_user;
+```
+
+4. Export environment variables before running the project:
+
+```bash
+export PGHOST=127.0.0.1
+export PGPORT=5433
+export PGUSER=nyhc_user
+export PGPASSWORD='your_password'
+export PGDATABASE=nyhc
+```
+
+5. Verify connection:
+
+```bash
+psql -h 127.0.0.1 -p 5433 -U nyhc_user -d nyhc
+```
+
+If your PostgreSQL runs on default port 5432 and your OS user matches the DB user, you can skip this.
+
 ### 0. Install Dependencies
 Make sure you have Python 3.12 (or compatible) installed.
 
