@@ -1,26 +1,4 @@
-
-# Ignore all CSVs in data except mappings
-data/raw/*.csv
-data/processed/*.csv
-data/predictions/*.csv
-data/residuals/*.csv
-
-
-!data/mappings/*.csv
-
-
-sparcs-sql-analysis/data/**/*.csv
-
-# Ignore all models by default
-models/*
-
-# Keep only final deliverables
-!models/final/*
-!models/final/**/*.pkl
-!models/final/**/*.joblib
-
-.DS_Store
-.vscode/
-*.pyc
+.venv/
 __pycache__/
-.env
+.ipynb_checkpoints/
+.DS_Store
