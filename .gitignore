@@ -1,4 +1,15 @@
-.venv/
-__pycache__/
-.ipynb_checkpoints/
+# OS
 .DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual env
+.venv/
+pyvenv.cfg
+
+# Jupyter / VS Code
+.ipynb_checkpoints/
+.vscode/
